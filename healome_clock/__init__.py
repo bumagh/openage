@@ -1,0 +1,33 @@
+"""
+Healome Aging Clock — blood-based biological age estimation from standard clinical biomarkers.
+
+Primary model: GradientBoosting trained on ~50K NHANES records (1999-2020).
+Two variants:
+  - standard: 21 features (15 lab biomarkers + 6 questionnaire items)
+  - extended: 35 features (expanded lab panel + questionnaire)
+
+Usage:
+    from healome_clock import predict_age
+    result = predict_age({"LBXGH": 5.4, "LBXSGL": 95, ...}, chronological_age=45)
+    print(result.summary())
+"""
+
+__version__ = "0.1.0"
+
+from healome_clock.inference import predict_age, HealomeClock, AgeResult
+from healome_clock.models.tree import (
+    TreeModel,
+    STANDARD_21_FEATURES,
+    EXTENDED_35_FEATURES,
+    FEATURE_NAMES,
+)
+
+__all__ = [
+    "predict_age",
+    "HealomeClock",
+    "AgeResult",
+    "TreeModel",
+    "STANDARD_21_FEATURES",
+    "EXTENDED_35_FEATURES",
+    "FEATURE_NAMES",
+]

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model weights — large files, use Git LFS
+# The .joblib files in healome_clock/models/weights/ ARE tracked (via LFS)
+*.pkl
+*.pt
+*.pth
+
+# Pytest
+.pytest_cache/
+
+# Data (sample data is tracked; large datasets are not)
+*.xpt
+*.sas7bdat
+nhanes_data_dump/

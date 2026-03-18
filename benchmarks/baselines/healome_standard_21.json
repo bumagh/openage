@@ -1,0 +1,22 @@
+{
+  "model_name": "Healome Clock — Standard (21 features)",
+  "authors": "Nikhil Yadala / Healome",
+  "description": "GradientBoostingRegressor with 15 lab biomarkers + 6 questionnaire items, trained on NHANES 2003-2020",
+  "date": "2024-04-24",
+  "model_type": "GradientBoostingRegressor",
+  "n_features": 21,
+  "training_data": "NHANES 2003-2020 (~50K records)",
+  "track1_age_prediction": {
+    "mae": 5.1065,
+    "rmse": 7.6631,
+    "r2": 0.9058,
+    "pearson_r": 0.9518,
+    "n_test_samples": 45000,
+    "test_split_method": "random 10/90 test split, random_state=3454"
+  },
+  "track2_survival": {
+    "concordance": 0.99,
+    "n_mortality_records": 50000,
+    "km_separation": "Clear separation between accelerated (bio_age - chrono_age >= 5) and decelerated (<= -5) groups"
+  }
+}
