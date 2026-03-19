@@ -7,7 +7,7 @@ setup(
     name="healome-clock",
     version="0.1.0",
     author="Nikhil Yadala",
-    author_email="nikhil@healome.com",
+    author_email="nikhil@healome.one",
     description="Open-source blood-based biological age estimation from standard clinical biomarkers",
     long_description=long_description,
     long_description_content_type="text/markdown",
