@@ -36,6 +36,9 @@ healome_clock/models/weights/*.joblib
 # Pytest
 .pytest_cache/
 
+# Upload script (contains org-specific HF config)
+scripts/upload_to_huggingface.py
+
 # Data (sample data is tracked; large datasets are not)
 *.xpt
 *.sas7bdat
