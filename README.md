@@ -230,7 +230,6 @@ See [benchmarks/README.md](benchmarks/README.md) for how to submit your model.
 ## Repo Structure
 
 ```
-healome_clock_oss/
 ├── healome_clock/
 │   ├── models/              # Tree-based (primary) + experimental neural net
 │   ├── data/                # NHANES + mortality data loaders
