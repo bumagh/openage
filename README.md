@@ -8,14 +8,26 @@
 
 ---
 
+## Core thesis
+
+This project is built around one idea: there is a **small, fixed set of blood-derived measurements**—a **minimal clique**—that, together with the right low-bias model, captures almost all the signal that matters for **biological age** and **mortality prediction**. Hyperparameter tuning and feature ablation were aimed at finding that clique, not at maximizing complexity. Features outside this set either add little or actively **hurt** some metrics once the core signal is already represented.
+
 ## Why This Exists
 
 Many biological age models are difficult to interpret in clinical contexts, hard to benchmark reproducibly, and show high variability on repeated measurements. I built this release to provide a transparent, reproducible baseline using routine blood biomarkers and a public dataset. The methodology, model, and evaluation are fully open so the community can inspect, compare, and improve on this work.
 
+## Model and feature selection
+
+We evaluated a wide range of predictors, from simple to highly flexible: **linear regression**, **elastic net**, **gradient-boosted trees**, **bagging / tree ensembles**, broader **ensembles**, **neural networks**, **CNNs**, and **variational autoencoders**. We **settled on the architectures that performed best** on our validation objectives and then focused on **feature pruning**.
+
+Starting from roughly **120 blood-related biomarkers**, we progressively dropped inputs that did not improve (or did not stably improve) held-out accuracy. That process yielded the **35-feature extended** model. We took one further reduction step to the **21-feature standard** model: a smaller panel **without a meaningful accuracy penalty**, so routine labs stay sufficient where the extended panel is not available. On the standard model, performance remains in a strong range on at least one of the headline metrics we track.
+
+**Beyond the extended model**, adding more markers did **not** improve metrics; in several cases it caused **clear degradation**. That pattern supports the thesis above: once the minimal clique is covered, extra features are mostly noise or redundancy for this task.
+
 ## Design Principles
 
 - **Interpretable** — Built on standard clinical biomarkers (CBC + CMP + medical history) that map to physiological systems physicians already reason about.
-- **Reproducible** — Trained entirely on public data ([NHANES](https://www.cdc.gov/nchs/nhanes/index.htm)). Anyone can retrain, validate, and audit.
+- **Reproducible** — Trained entirely on open, public survey data. Anyone can retrain, validate, and audit.
 - **Validated against mortality** — Survival analysis confirms the model's biological age estimates predict mortality (Cox PH concordance = 0.99).
 - **Extensible** — Structured for community contributions: new data sources, models, and benchmarks.
 
@@ -27,7 +39,7 @@ cd healome-aging-clock
 pip install -e .
 ```
 
-Model weights and the NHANES validation dataset are hosted on the [Hugging Face Hub](https://huggingface.co/Healome). Download them once (see below) or let the library fetch weights automatically when you first use a model.
+Model weights and validation data are on the [Hugging Face Hub](https://huggingface.co/Healome): [model weights](https://huggingface.co/Healome/healome-clock-weights), [validation dataset](https://huggingface.co/datasets/Healome/nhanes-validation-data). Download once (see below) or let the library fetch weights automatically when you first use a model.
 
 ### Requirements
 
@@ -46,9 +58,9 @@ Model weights and the NHANES validation dataset are hosted on the [Hugging Face 
 
 ### Biomarker names (friendly keys)
 
-`predict_age` and `HealomeClock.predict` accept **canonical snake_case names** (recommended) or the original **NHANES variable codes** (e.g. `LBXGH`). Common synonyms work too (e.g. `hba1c_percent` → glycohemoglobin). See `healome_clock.feature_aliases` and `NHANES_TO_CANONICAL_KEY` in code for the full map.
+`predict_age` and `HealomeClock.predict` accept **canonical snake_case names** (recommended) or the **original survey variable codes** used in training (e.g. `LBXGH`). Common synonyms work too (e.g. `hba1c_percent` → glycohemoglobin). See `healome_clock.feature_aliases` and `NHANES_TO_CANONICAL_KEY` in code for the full map.
 
-**Questionnaire (NHANES MCQ) fields** use `1 = Yes`, `2 = No` for the six history items below, matching how the model was trained.
+**Questionnaire (history) fields** use `1 = Yes`, `2 = No` for the six items below, matching how the model was trained.
 
 ### Example — standard model (21 features)
 
@@ -126,7 +138,7 @@ result = predict_age({
 print(result.summary())
 ```
 
-CSV/JSON column names can use these same friendly keys (or NHANES codes).
+CSV/JSON column names can use these same friendly keys (or the original survey codes).
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/healome/healome-aging-clock/blob/main/notebooks/demo.ipynb)
 
@@ -137,9 +149,9 @@ CSV/JSON column names can use these same friendly keys (or NHANES codes).
 | **Standard** | 21 (15 lab + 6 questionnaire) | 5.11 years | 0.906 | 0.952 |
 | **Extended** | 35 (expanded lab panel) | 6.07 years | 0.873 | 0.934 |
 
-Both models: GradientBoosting trained on ~50K NHANES records (2003-2020), validated with Cox PH survival analysis (concordance = 0.99).
+Both models: GradientBoosting trained on ~50K public survey records (2003–2020), validated with Cox PH survival analysis (concordance = 0.99).
 
-Use **standard** for routine panels (21 inputs) or **extended** when you have the larger lipid/liver/electrolyte set (35 inputs). Pass biomarkers as **canonical friendly names** (see examples above) or NHANES codes.
+Use **standard** for routine panels (21 inputs) or **extended** when you have the larger lipid/liver/electrolyte set (35 inputs). Pass biomarkers as **canonical friendly names** (see examples above) or the original survey codes.
 
 Models load from `healome_clock/models/weights/` (standard_21feat.joblib, extended_35feat.joblib). If the files are missing, the library will try to download them from the Hub; otherwise see [Downloading model weights and validation data](#downloading-model-weights-and-validation-data) below.
 
@@ -155,12 +167,12 @@ clock = HealomeClock(variant="extended")
 
 ## Downloading model weights and validation data
 
-Model weights and the NHANES validation dataset are hosted on the **Hugging Face Hub** under [Healome](https://huggingface.co/Healome):
+Assets live on the **Hugging Face Hub** under [Healome](https://huggingface.co/Healome). If a link below does not open, use the org page → **Models** / **Datasets** and select the matching repo.
 
-| Resource | Hugging Face repo | Local path (after download) |
-|----------|-------------------|-----------------------------|
-| **Model weights** | [Healome/healome-clock-weights](https://huggingface.co/Healome/healome-clock-weights) | `healome_clock/models/weights/` |
-| **NHANES validation data** | [Healome/nhanes-validation-data](https://huggingface.co/Healome/nhanes-validation-data) | `nhanes_data_dump/` |
+| Resource | Hugging Face | Local path (after download) |
+|----------|--------------|-----------------------------|
+| **Model weights** | [`Healome/healome-clock-weights`](https://huggingface.co/Healome/healome-clock-weights) | `healome_clock/models/weights/` |
+| **Validation data** (XPT bundle for `tests/validate_on_nhanes.py`) | [`Healome/nhanes-validation-data`](https://huggingface.co/datasets/Healome/nhanes-validation-data) · [files](https://huggingface.co/datasets/Healome/nhanes-validation-data/tree/main) | `nhanes_data_dump/` |
 
 ### Model weights (standard_21feat.joblib, extended_35feat.joblib)
 
@@ -183,9 +195,9 @@ huggingface-cli download Healome/healome-clock-weights standard_21feat.joblib --
 huggingface-cli download Healome/healome-clock-weights extended_35feat.joblib --local-dir healome_clock/models/weights
 ```
 
-### NHANES validation data (nhanes_data_dump)
+### Validation data (`nhanes_data_dump`)
 
-To run `tests/validate_on_nhanes.py`, download the dataset into the repo root:
+To run `tests/validate_on_nhanes.py`, download the dataset snapshot into the repo root:
 
 ```bash
 huggingface-cli download Healome/nhanes-validation-data --local-dir nhanes_data_dump --repo-type dataset
@@ -199,11 +211,11 @@ snapshot_download(repo_id="Healome/nhanes-validation-data", repo_type="dataset",
 
 Place the contents so that `nhanes_data_dump/2017-2020/` and (optionally) `nhanes_data_dump/extended_data/` match the structure described in `nhanes_data_dump/README.md`.
 
-**Maintainers:** To upload or update the Hub assets, use `python scripts/upload_to_huggingface.py` (weights) or add `--dataset` for the NHANES validation data. Requires `huggingface_hub` and `huggingface-cli login`.
+**Maintainers:** To upload or update Hub assets, use `python scripts/upload_to_huggingface.py` (weights) or add `--dataset` for the validation bundle. Requires `huggingface_hub` and `huggingface-cli login`.
 
 ## Training Data
 
-Trained on approximately 50,000 records from [NHANES](https://www.cdc.gov/nchs/nhanes/index.htm) survey cycles 2003-2020. See [MODEL_CARD.md](MODEL_CARD.md) and [DATASET_FACTS.md](DATASET_FACTS.md) for details.
+Trained on approximately 50,000 records from public survey cycles 2003–2020. See [MODEL_CARD.md](MODEL_CARD.md) and [DATASET_FACTS.md](DATASET_FACTS.md) for details and primary sources.
 
 ## Internal Validation
 
@@ -211,7 +223,7 @@ Validated against a proprietary longitudinal clinical dataset (~1.5M blood-test 
 
 ## Survival Analysis
 
-The model's biological age predictions are validated against mortality outcomes using NHANES linked mortality data:
+The model's biological age predictions are validated against mortality outcomes using linked public mortality records:
 
 - **Cox PH Concordance: 0.99** — biological age is a strong predictor of mortality
 - **Kaplan-Meier**: Clear separation between accelerated aging (bio_age - chrono_age >= 5 years) and decelerated aging groups
@@ -232,7 +244,7 @@ See [benchmarks/README.md](benchmarks/README.md) for how to submit your model.
 ```
 ├── healome_clock/
 │   ├── models/              # Tree-based (primary) + experimental neural net
-│   ├── data/                # NHANES + mortality data loaders
+│   ├── data/                # Public survey + mortality data loaders
 │   ├── evaluation/          # Metrics, survival analysis, leaderboard
 │   ├── inference.py         # Main prediction API
 │   └── visualization.py     # Plotting utilities
