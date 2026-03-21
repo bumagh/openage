@@ -2,7 +2,7 @@
 
 **Open-source blood-based biological age estimation from standard clinical biomarkers.**
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nikhilYadala/healome_bio_age/blob/main/notebooks/demo.ipynb)
 
@@ -295,4 +295,6 @@ I believe the field benefits from better benchmarking and open scrutiny. See [CO
 
 ## License
 
-Apache License 2.0. See [LICENSE](LICENSE).
+**Open-source**: GNU Affero General Public License v3.0 (AGPLv3). See [LICENSE](LICENSE).
+
+**Commercial use** — including use by companies, paid products, SaaS, clinics, diagnostics, pharma, biotech, or revenue-generating services — requires a separate commercial license from Healome One Inc. Contact [nikhil@healome.one](mailto:nikhil@healome.one) for terms.
