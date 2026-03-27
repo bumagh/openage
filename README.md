@@ -167,7 +167,7 @@ clock = HealomeClock(variant="extended")
 
 ## Downloading model weights and validation data
 
-Assets live on the **Hugging Face Hub** under [Healome](https://huggingface.co/Healome). If a link below does not open, use the org page → **Models** / **Datasets** and select the matching repo.
+Assets live on the **Hugging Face Hub** under [Healome](https://huggingface.co/Healome).
 
 | Resource | Hugging Face | Local path (after download) |
 |----------|--------------|-----------------------------|
@@ -283,8 +283,8 @@ Healome is a longevity-focused health technology company building blood-based ag
   title={Healome Clock: An Open-Source, Interpretable, and Actionable Blood-Based Biological Aging Clock with Disease-Specific Mortality Validation},
   author={Yadala, Nikhil},
   year={2026},
-  doi={10.1101/2026.XX.XX.XXXXXXX},
-  url={https://doi.org/10.1101/2026.XX.XX.XXXXXXX}
+  doi={10.5281/zenodo.19244274},
+  url={https://doi.org/10.5281/zenodo.19244274}
 }
 ```
 
