@@ -4,7 +4,6 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nikhilYadala/healome_bio_age/blob/main/notebooks/demo.ipynb)
 
 ---
 
@@ -139,8 +138,6 @@ print(result.summary())
 ```
 
 CSV/JSON column names can use these same friendly keys (or the original survey codes).
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nikhilYadala/healome_bio_age/blob/main/notebooks/demo.ipynb)
 
 ## Two Model Variants
 
