@@ -1,5 +1,7 @@
 """
-Healome Aging Clock — blood-based biological age estimation from standard clinical biomarkers.
+OpenAge — open-source blood-based biological age estimation from standard clinical biomarkers.
+
+Developed by Healome (https://healome.ai).
 
 Primary model: GradientBoosting trained on ~50K NHANES records (1999-2020).
 Two variants:
@@ -7,20 +9,20 @@ Two variants:
   - extended: 35 features (expanded lab panel + questionnaire)
 
 Usage:
-    from healome_clock import predict_age
+    from openage import predict_age
     result = predict_age({"glycohemoglobin_percent": 5.4, "glucose_mg_dl": 95, ...}, chronological_age=45)
     print(result.summary())
 """
 
 __version__ = "0.1.0"
 
-from healome_clock.inference import predict_age, HealomeClock, AgeResult
-from healome_clock.feature_aliases import (
+from openage.inference import predict_age, HealomeClock, AgeResult
+from openage.feature_aliases import (
     NHANES_TO_CANONICAL_KEY,
     normalize_blood_panel_to_nhanes,
     list_friendly_features_for_variant,
 )
-from healome_clock.models.tree import (
+from openage.models.tree import (
     TreeModel,
     STANDARD_21_FEATURES,
     EXTENDED_35_FEATURES,

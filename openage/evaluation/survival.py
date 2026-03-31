@@ -1,7 +1,7 @@
 """
 Survival analysis evaluation for biological age models.
 
-Track 2 of the Healome benchmarking framework. Uses lifelines for
+Track 2 of the OpenAge benchmarking framework. Uses lifelines for
 Kaplan-Meier survival curves and Cox Proportional Hazards models.
 
 Requires: pip install lifelines

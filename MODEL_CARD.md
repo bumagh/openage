@@ -1,4 +1,4 @@
-# Model Card: Healome Aging Clock
+# Model Card: OpenAge
 
 ## Model Overview
 
@@ -31,7 +31,7 @@ The production model uses sklearn's `GradientBoostingRegressor`, trained to pred
 
 ### Experimental: Autoencoder + CNN
 
-An experimental neural network architecture is also provided in `healome_clock/models/experimental/`. It uses a two-branch design: an autoencoder compresses 42 biomarkers into a 30-dim latent space, and a 1D CNN predicts age from the latent representation. See `models/experimental/autoencoder_cnn.py` for details.
+An experimental neural network architecture is also provided in `openage/models/experimental/`. It uses a two-branch design: an autoencoder compresses 42 biomarkers into a 30-dim latent space, and a 1D CNN predicts age from the latent representation. See `models/experimental/autoencoder_cnn.py` for details.
 
 ## Input Features
 

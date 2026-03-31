@@ -26,8 +26,8 @@ Evaluate whether your biological age predictions are associated with mortality.
 
 | Model | Features | MAE | R² | Concordance |
 |-------|----------|-----|-----|-------------|
-| Healome Standard | 21 | 5.11 | 0.906 | 0.81 |
-| Healome Extended | 35 | 6.07 | 0.873 | 0.83 |
+| OpenAge Standard | 21 | 5.11 | 0.906 | 0.81 |
+| OpenAge Extended | 35 | 6.07 | 0.873 | 0.83 |
 
 ## How to Submit
 
@@ -36,7 +36,7 @@ Evaluate whether your biological age predictions are associated with mortality.
 3. **Generate** your submission JSON:
 
 ```python
-from healome_clock.evaluation.leaderboard import create_submission, save_submission
+from openage.evaluation.leaderboard import create_submission, save_submission
 
 submission = create_submission(
     model_name="Your Model Name",

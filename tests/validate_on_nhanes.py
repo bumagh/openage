@@ -24,12 +24,12 @@ warnings.filterwarnings("ignore")
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from healome_clock.models.tree import (
+from openage.models.tree import (
     TreeModel,
     STANDARD_21_FEATURES,
     EXTENDED_35_FEATURES,
 )
-from healome_clock.evaluation.metrics import compute_age_metrics, print_metrics
+from openage.evaluation.metrics import compute_age_metrics, print_metrics
 
 
 _REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")

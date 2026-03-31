@@ -2,7 +2,7 @@
 Experimental: Autoencoder + CNN architecture for biological age estimation.
 
 This is a research prototype. The primary production model is the
-tree-based GradientBoosting model in healome_clock.models.tree.
+tree-based GradientBoosting model in openage.models.tree.
 
 Architecture:
   Encoder (42 → 75 → 55 → 30) → latent space

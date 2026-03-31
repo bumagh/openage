@@ -9,14 +9,17 @@ Feature order is critical — .joblib models expect features in the exact
 order they were trained on.
 """
 
+import logging
 import numpy as np
 import pandas as pd
 import joblib
 from typing import Union, Optional, Dict, List
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 WEIGHTS_DIR = Path(__file__).parent / "weights"
-HF_WEIGHTS_REPO = "Healome/healome-clock-weights"
+HF_WEIGHTS_REPO = "Healome/openage-weights"
 
 # --- Exact feature orders as used during training (order matters for .joblib) ---
 
@@ -128,6 +131,8 @@ MODEL_CONFIGS = {
         "weights_file": "standard_21feat.joblib",
         "n_features": 21,
         "description": "21-feature model (16 lab biomarkers + 5 questionnaire)",
+        "origin": "Healome",
+        "origin_url": "https://healome.ai",
         "training_params": {
             "model_type": "GradientBoostingRegressor",
             "n_estimators": 4000, "max_depth": 8,
@@ -144,6 +149,8 @@ MODEL_CONFIGS = {
         "weights_file": "extended_35feat.joblib",
         "n_features": 35,
         "description": "35-feature model (extended lab panel + questionnaire)",
+        "origin": "Healome",
+        "origin_url": "https://healome.ai",
         "training_params": {
             "model_type": "GradientBoostingRegressor",
             "n_estimators": 6000, "max_depth": 10,
@@ -199,6 +206,10 @@ class TreeModel:
         except ImportError:
             return
         filename = self.config["weights_file"]
+        logger.info(
+            "Downloading OpenAge model weights from Healome "
+            "(huggingface.co/%s)...", HF_WEIGHTS_REPO,
+        )
         try:
             hf_hub_download(
                 repo_id=HF_WEIGHTS_REPO,
@@ -206,6 +217,7 @@ class TreeModel:
                 local_dir=WEIGHTS_DIR,
                 local_dir_use_symlinks=False,
             )
+            logger.info("Download complete.")
         except Exception:
             pass
 
@@ -243,7 +255,7 @@ class TreeModel:
 
     def predict_single(self, biomarkers: Dict[str, float]) -> float:
         """Predict biological age from a dict of biomarker values (NHANES codes or friendly names)."""
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         normalized = normalize_blood_panel_to_nhanes(biomarkers, self.variant)
         df = pd.DataFrame([normalized])

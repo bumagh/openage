@@ -1,6 +1,6 @@
 # Methodology
 
-This document provides a distilled overview of the design decisions, tradeoffs, and rationale behind the Healome Aging Clock. A formal methodology paper is in preparation.
+This document provides a distilled overview of the design decisions, tradeoffs, and rationale behind OpenAge. A formal methodology paper is in preparation.
 
 ## Motivation
 

@@ -12,7 +12,7 @@ from typing import Dict, Optional, Union
 from pathlib import Path
 from datetime import datetime
 
-from healome_clock.evaluation.metrics import compute_age_metrics, compute_age_bucket_metrics
+from openage.evaluation.metrics import compute_age_metrics, compute_age_bucket_metrics
 
 
 SUBMISSION_SCHEMA = {

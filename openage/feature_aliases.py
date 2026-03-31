@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Set, Union
 
 import pandas as pd
 
-from healome_clock.models.tree import MODEL_CONFIGS
+from openage.models.tree import MODEL_CONFIGS
 
 # Primary friendly key per NHANES code (snake_case). Used in docs and optional APIs.
 NHANES_TO_CANONICAL_KEY: Dict[str, str] = {

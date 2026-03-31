@@ -4,18 +4,19 @@ from pathlib import Path
 long_description = (Path(__file__).parent / "README.md").read_text(encoding="utf-8")
 
 setup(
-    name="healome-clock",
+    name="openage",
     version="0.1.0",
     author="Nikhil Yadala",
     author_email="nikhil@healome.one",
     description="Open-source blood-based biological age estimation from standard clinical biomarkers",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://healome.ai",
+    url="https://github.com/Healome/openage",
     project_urls={
-        "Source": "https://github.com/nikhilYadala/healome_bio_age",
-        "Bug Tracker": "https://github.com/nikhilYadala/healome_bio_age/issues",
-        "Documentation": "https://github.com/nikhilYadala/healome_bio_age#readme",
+        "Source": "https://github.com/Healome/openage",
+        "Bug Tracker": "https://github.com/Healome/openage/issues",
+        "Documentation": "https://github.com/Healome/openage#readme",
+        "Company": "https://healome.ai",
     },
     packages=find_packages(),
     include_package_data=True,

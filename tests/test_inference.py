@@ -10,8 +10,8 @@ from pathlib import Path
 
 class TestFeatureAliases:
     def test_friendly_dict_maps_to_nhanes_standard(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
-        from healome_clock.models.tree import STANDARD_21_FEATURES
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.models.tree import STANDARD_21_FEATURES
 
         out = normalize_blood_panel_to_nhanes(
             {"glycohemoglobin_percent": 5.4, "glucose_mg_dl": 95},
@@ -22,7 +22,7 @@ class TestFeatureAliases:
         assert set(out.keys()) <= set(STANDARD_21_FEATURES)
 
     def test_unknown_dict_key_warns(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         with pytest.warns(UserWarning, match="Ignoring unknown"):
             out = normalize_blood_panel_to_nhanes(
@@ -33,19 +33,19 @@ class TestFeatureAliases:
         assert "not_a_real_marker" not in out
 
     def test_nhanes_codes_passthrough(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         out = normalize_blood_panel_to_nhanes({"LBXGH": 5.4, "LBXSGL": 95}, "standard")
         assert out == {"LBXGH": 5.4, "LBXSGL": 95}
 
     def test_synonym_hba1c(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         out = normalize_blood_panel_to_nhanes({"hba1c_percent": 5.4}, "standard")
         assert out["LBXGH"] == 5.4
 
     def test_dataframe_rename(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         df = pd.DataFrame([{"glycohemoglobin_percent": 5.4, "glucose_mg_dl": 95}])
         out = normalize_blood_panel_to_nhanes(df, "standard")
@@ -54,7 +54,7 @@ class TestFeatureAliases:
         assert float(out["LBXGH"].iloc[0]) == 5.4
 
     def test_conflicting_duplicate_raises(self):
-        from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
+        from openage.feature_aliases import normalize_blood_panel_to_nhanes
 
         with pytest.raises(ValueError, match="Conflicting"):
             normalize_blood_panel_to_nhanes(
@@ -63,8 +63,8 @@ class TestFeatureAliases:
             )
 
     def test_list_friendly_features_order_matches_model(self):
-        from healome_clock.feature_aliases import list_friendly_features_for_variant
-        from healome_clock.models.tree import STANDARD_21_FEATURES, EXTENDED_35_FEATURES
+        from openage.feature_aliases import list_friendly_features_for_variant
+        from openage.models.tree import STANDARD_21_FEATURES, EXTENDED_35_FEATURES
 
         std = list_friendly_features_for_variant("standard")
         assert [row[1] for row in std] == STANDARD_21_FEATURES
@@ -74,22 +74,22 @@ class TestFeatureAliases:
 
 class TestFeatureConstants:
     def test_standard_feature_count(self):
-        from healome_clock.models.tree import STANDARD_21_FEATURES
+        from openage.models.tree import STANDARD_21_FEATURES
         assert len(STANDARD_21_FEATURES) == 21
 
     def test_extended_feature_count(self):
-        from healome_clock.models.tree import EXTENDED_35_FEATURES
+        from openage.models.tree import EXTENDED_35_FEATURES
         assert len(EXTENDED_35_FEATURES) == 35
 
     def test_standard_subset_of_extended(self):
-        from healome_clock.models.tree import STANDARD_21_FEATURES, EXTENDED_35_FEATURES
+        from openage.models.tree import STANDARD_21_FEATURES, EXTENDED_35_FEATURES
         standard_set = set(STANDARD_21_FEATURES)
         extended_set = set(EXTENDED_35_FEATURES)
         missing = standard_set - extended_set
         assert len(missing) == 0, f"Standard features not in extended: {missing}"
 
     def test_feature_names_coverage(self):
-        from healome_clock.models.tree import (
+        from openage.models.tree import (
             STANDARD_21_FEATURES, EXTENDED_35_FEATURES, FEATURE_NAMES
         )
         all_feats = set(STANDARD_21_FEATURES) | set(EXTENDED_35_FEATURES)
@@ -97,14 +97,14 @@ class TestFeatureConstants:
             assert feat in FEATURE_NAMES, f"{feat} missing from FEATURE_NAMES"
 
     def test_model_configs_exist(self):
-        from healome_clock.models.tree import MODEL_CONFIGS
+        from openage.models.tree import MODEL_CONFIGS
         assert "standard" in MODEL_CONFIGS
         assert "extended" in MODEL_CONFIGS
         assert MODEL_CONFIGS["standard"]["n_features"] == 21
         assert MODEL_CONFIGS["extended"]["n_features"] == 35
 
     def test_importance_order_counts(self):
-        from healome_clock.models.tree import (
+        from openage.models.tree import (
             STANDARD_21_IMPORTANCE_ORDER, EXTENDED_35_IMPORTANCE_ORDER
         )
         assert len(STANDARD_21_IMPORTANCE_ORDER) == 21
@@ -113,18 +113,18 @@ class TestFeatureConstants:
 
 class TestTreeModel:
     def test_instantiation(self):
-        from healome_clock.models.tree import TreeModel
+        from openage.models.tree import TreeModel
         model = TreeModel(variant="standard")
         assert model.variant == "standard"
         assert model.n_features == 21
 
     def test_invalid_variant_raises(self):
-        from healome_clock.models.tree import TreeModel
+        from openage.models.tree import TreeModel
         with pytest.raises(ValueError, match="Unknown variant"):
             TreeModel(variant="nonexistent")
 
     def test_prepare_features_order(self):
-        from healome_clock.models.tree import TreeModel, STANDARD_21_FEATURES
+        from openage.models.tree import TreeModel, STANDARD_21_FEATURES
         model = TreeModel(variant="standard")
         data = {feat: float(i) for i, feat in enumerate(STANDARD_21_FEATURES)}
         data["EXTRA_COL"] = 999.0
@@ -135,7 +135,7 @@ class TestTreeModel:
             assert x[0, i] == float(i)
 
     def test_prepare_features_missing_cols(self):
-        from healome_clock.models.tree import TreeModel
+        from openage.models.tree import TreeModel
         model = TreeModel(variant="standard")
         df = pd.DataFrame([{"LBXGH": 5.4, "LBXSGL": 95}])
         x = model.prepare_features(df)
@@ -145,7 +145,7 @@ class TestTreeModel:
 
 class TestAgeResult:
     def test_result_creation(self):
-        from healome_clock.inference import AgeResult
+        from openage.inference import AgeResult
         result = AgeResult(
             biological_age=42.3,
             chronological_age_delta=-2.7,
@@ -156,7 +156,7 @@ class TestAgeResult:
         assert "42.3" in repr(result)
 
     def test_result_summary(self):
-        from healome_clock.inference import AgeResult
+        from openage.inference import AgeResult
         result = AgeResult(
             biological_age=42.3,
             chronological_age_delta=-2.7,
@@ -170,13 +170,13 @@ class TestAgeResult:
 
 class TestHealomeClock:
     def test_instantiation(self):
-        from healome_clock.inference import HealomeClock
+        from openage.inference import HealomeClock
         clock = HealomeClock(variant="standard")
         assert clock.variant == "standard"
         assert len(clock.features) == 21
 
     def test_repr(self):
-        from healome_clock.inference import HealomeClock
+        from openage.inference import HealomeClock
         clock = HealomeClock(variant="extended")
         r = repr(clock)
         assert "extended" in r
@@ -185,7 +185,7 @@ class TestHealomeClock:
 
 class TestMetrics:
     def test_compute_age_metrics(self):
-        from healome_clock.evaluation.metrics import compute_age_metrics
+        from openage.evaluation.metrics import compute_age_metrics
         y_true = np.array([30, 40, 50, 60, 70])
         y_pred = np.array([32, 38, 52, 58, 72])
         metrics = compute_age_metrics(y_true, y_pred)
@@ -197,7 +197,7 @@ class TestMetrics:
         assert metrics["n_samples"] == 5
 
     def test_compute_subgroup_metrics(self):
-        from healome_clock.evaluation.metrics import compute_subgroup_metrics
+        from openage.evaluation.metrics import compute_subgroup_metrics
         y_true = np.array([25, 35, 55, 65])
         y_pred = np.array([27, 33, 57, 63])
         groups = np.array(["young", "young", "old", "old"])
@@ -206,7 +206,7 @@ class TestMetrics:
         assert "mae" in df.columns
 
     def test_compute_age_bucket_metrics(self):
-        from healome_clock.evaluation.metrics import compute_age_bucket_metrics
+        from openage.evaluation.metrics import compute_age_bucket_metrics
         y_true = np.array([25, 35, 45, 55, 65, 75])
         y_pred = y_true + 2
         df = compute_age_bucket_metrics(y_true, y_pred)
@@ -215,7 +215,7 @@ class TestMetrics:
 
 class TestSurvival:
     def test_classify_aging_rate(self):
-        from healome_clock.evaluation.survival import classify_aging_rate
+        from openage.evaluation.survival import classify_aging_rate
         bio = np.array([50, 40, 45])
         chrono = np.array([40, 50, 45])
         labels = classify_aging_rate(bio, chrono, threshold=5)
@@ -226,7 +226,7 @@ class TestSurvival:
 
 class TestLeaderboard:
     def test_create_submission(self):
-        from healome_clock.evaluation.leaderboard import create_submission
+        from openage.evaluation.leaderboard import create_submission
         y_true = np.array([30, 40, 50, 60, 70])
         y_pred = np.array([32, 38, 52, 58, 72])
         sub = create_submission("test_model", y_true, y_pred, authors="Test")
@@ -237,7 +237,7 @@ class TestLeaderboard:
 
 class TestDataRegistry:
     def test_register_and_list(self):
-        from healome_clock.data.registry import (
+        from openage.data.registry import (
             register_data_source, list_data_sources, get_data_source
         )
         register_data_source(
@@ -253,6 +253,6 @@ class TestDataRegistry:
         assert source["description"] == "Test data source"
 
     def test_missing_source_raises(self):
-        from healome_clock.data.registry import get_data_source
+        from openage.data.registry import get_data_source
         with pytest.raises(KeyError):
             get_data_source("nonexistent_source_xyz")

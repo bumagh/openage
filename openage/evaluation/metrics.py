@@ -1,7 +1,7 @@
 """
 Age prediction evaluation metrics.
 
-Track 1 of the Healome benchmarking framework.
+Track 1 of the OpenAge benchmarking framework.
 """
 
 import numpy as np

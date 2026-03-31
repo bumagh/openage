@@ -1,6 +1,8 @@
-# The Healome Aging Clock
+# OpenAge
 
 **Open-source blood-based biological age estimation from standard clinical biomarkers.**
+
+Developed by [Healome](https://healome.ai).
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -33,12 +35,12 @@ Starting from roughly **120 blood-related biomarkers**, we progressively dropped
 ## Quick Start
 
 ```bash
-git clone https://github.com/nikhilYadala/healome_bio_age.git
-cd healome_bio_age
+git clone https://github.com/Healome/openage.git
+cd openage
 pip install -e .
 ```
 
-Model weights and validation data are on the [Hugging Face Hub](https://huggingface.co/Healome): [model weights](https://huggingface.co/Healome/healome-clock-weights), [validation dataset](https://huggingface.co/datasets/Healome/nhanes-validation-data). Download once (see below) or let the library fetch weights automatically when you first use a model.
+Model weights and validation data are on the [Hugging Face Hub](https://huggingface.co/Healome): [model weights](https://huggingface.co/Healome/openage-weights), [validation dataset](https://huggingface.co/datasets/Healome/nhanes-validation-data). Download once (see below) or let the library fetch weights automatically when you first use a model.
 
 ### Requirements
 
@@ -57,14 +59,14 @@ Model weights and validation data are on the [Hugging Face Hub](https://huggingf
 
 ### Biomarker names (friendly keys)
 
-`predict_age` and `HealomeClock.predict` accept **canonical snake_case names** (recommended) or the **original survey variable codes** used in training (e.g. `LBXGH`). Common synonyms work too (e.g. `hba1c_percent` → glycohemoglobin). See `healome_clock.feature_aliases` and `NHANES_TO_CANONICAL_KEY` in code for the full map.
+`predict_age` and `HealomeClock.predict` accept **canonical snake_case names** (recommended) or the **original survey variable codes** used in training (e.g. `LBXGH`). Common synonyms work too (e.g. `hba1c_percent` → glycohemoglobin). See `openage.feature_aliases` and `NHANES_TO_CANONICAL_KEY` in code for the full map.
 
 **Questionnaire (history) fields** use `1 = Yes`, `2 = No` for the six items below, matching how the model was trained.
 
 ### Example — standard model (21 features)
 
 ```python
-from healome_clock import predict_age
+from openage import predict_age
 
 result = predict_age({
     "mean_cell_volume_fl": 93,                      # MCV, fL
@@ -150,10 +152,10 @@ Both models: GradientBoosting trained on ~50K public survey records (2003–2020
 
 Use **standard** for routine panels (21 inputs) or **extended** when you have the larger lipid/liver/electrolyte set (35 inputs). Pass biomarkers as **canonical friendly names** (see examples above) or the original survey codes.
 
-Models load from `healome_clock/models/weights/` (standard_21feat.joblib, extended_35feat.joblib). If the files are missing, the library will try to download them from the Hub; otherwise see [Downloading model weights and validation data](#downloading-model-weights-and-validation-data) below.
+Models load from `openage/models/weights/` (standard_21feat.joblib, extended_35feat.joblib). If the files are missing, the library will try to download them from the Hub; otherwise see [Downloading model weights and validation data](#downloading-model-weights-and-validation-data) below.
 
 ```python
-from healome_clock import HealomeClock
+from openage import HealomeClock
 
 # Standard model (15 blood markers + 6 medical history questions)
 clock = HealomeClock(variant="standard")
@@ -168,7 +170,7 @@ Assets live on the **Hugging Face Hub** under [Healome](https://huggingface.co/H
 
 | Resource | Hugging Face | Local path (after download) |
 |----------|--------------|-----------------------------|
-| **Model weights** | [`Healome/healome-clock-weights`](https://huggingface.co/Healome/healome-clock-weights) | `healome_clock/models/weights/` |
+| **Model weights** | [`Healome/openage-weights`](https://huggingface.co/Healome/openage-weights) | `openage/models/weights/` |
 | **Validation data** (XPT bundle for `tests/validate_on_nhanes.py`) | [`Healome/nhanes-validation-data`](https://huggingface.co/datasets/Healome/nhanes-validation-data) · [files](https://huggingface.co/datasets/Healome/nhanes-validation-data/tree/main) | `nhanes_data_dump/` |
 
 ### Model weights (standard_21feat.joblib, extended_35feat.joblib)
@@ -180,16 +182,16 @@ Assets live on the **Hugging Face Hub** under [Healome](https://huggingface.co/H
 from huggingface_hub import hf_hub_download
 from pathlib import Path
 
-weights_dir = Path("healome_clock/models/weights")
+weights_dir = Path("openage/models/weights")
 weights_dir.mkdir(parents=True, exist_ok=True)
 for name in ["standard_21feat.joblib", "extended_35feat.joblib"]:
-    hf_hub_download(repo_id="Healome/healome-clock-weights", filename=name, local_dir=weights_dir)
+    hf_hub_download(repo_id="Healome/openage-weights", filename=name, local_dir=weights_dir)
 ```
 
 **Option C — CLI:**
 ```bash
-huggingface-cli download Healome/healome-clock-weights standard_21feat.joblib --local-dir healome_clock/models/weights
-huggingface-cli download Healome/healome-clock-weights extended_35feat.joblib --local-dir healome_clock/models/weights
+huggingface-cli download Healome/openage-weights standard_21feat.joblib --local-dir openage/models/weights
+huggingface-cli download Healome/openage-weights extended_35feat.joblib --local-dir openage/models/weights
 ```
 
 ### Validation data (`nhanes_data_dump`)
@@ -239,7 +241,7 @@ See [benchmarks/README.md](benchmarks/README.md) for how to submit your model.
 ## Repo Structure
 
 ```
-├── healome_clock/
+├── openage/
 │   ├── models/              # Tree-based (primary) + experimental neural net
 │   ├── data/                # Public survey + mortality data loaders
 │   ├── evaluation/          # Metrics, survival analysis, leaderboard
@@ -269,9 +271,9 @@ Read [LIMITATIONS.md](LIMITATIONS.md) before using. Key points:
 
 Star this repo or follow [@Healome](https://twitter.com/nikhilyadala) for updates.
 
-## About Healome
+## About
 
-Healome is a longevity-focused health technology company building blood-based aging models and tools for longitudinal health tracking. Learn more at [healome.ai](https://healome.ai).
+OpenAge is developed and maintained by [Healome](https://healome.ai), a longevity-focused health technology company building blood-based aging models and tools for longitudinal health tracking.
 
 ## Citation
 
@@ -293,4 +295,4 @@ I believe the field benefits from better benchmarking and open scrutiny. See [CO
 
 **Open-source**: GNU Affero General Public License v3.0 (AGPLv3). See [LICENSE](LICENSE).
 
-**Commercial use without AGPL compliance** — organizations that wish to integrate the Healome Clock into proprietary or closed-source products, SaaS platforms, clinical tools, diagnostics, or other applications without releasing their source code — requires a separate commercial license from Healome One Inc. Contact [nikhil@healome.one](mailto:nikhil@healome.one) for terms.
+**Commercial use without AGPL compliance** — organizations that wish to integrate OpenAge into proprietary or closed-source products, SaaS platforms, clinical tools, diagnostics, or other applications without releasing their source code — requires a separate commercial license from Healome One Inc. Contact [nikhil@healome.one](mailto:nikhil@healome.one) for terms.

@@ -1,5 +1,5 @@
 """
-Inference pipeline for the Healome Aging Clock.
+Inference pipeline for OpenAge (by Healome).
 
 Primary model: tree-based GradientBoosting (standard 21-feature or extended 35-feature).
 Experimental: autoencoder+CNN (see models.experimental).
@@ -11,8 +11,8 @@ from typing import Union, Optional, Dict
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from healome_clock.feature_aliases import normalize_blood_panel_to_nhanes
-from healome_clock.models.tree import (
+from openage.feature_aliases import normalize_blood_panel_to_nhanes
+from openage.models.tree import (
     TreeModel,
     STANDARD_21_FEATURES,
     EXTENDED_35_FEATURES,
@@ -40,7 +40,7 @@ class AgeResult:
         return "".join(parts)
 
     def summary(self) -> str:
-        lines = [f"Healome Biological Age Estimate: {self.biological_age:.1f} years"]
+        lines = [f"Healome OpenAge Estimate: {self.biological_age:.1f} years"]
         if self.chronological_age_delta is not None:
             direction = "older" if self.chronological_age_delta > 0 else "younger"
             lines.append(
@@ -176,7 +176,7 @@ def predict_age(
         AgeResult with biological age estimate.
 
     Example:
-        >>> from healome_clock import predict_age
+        >>> from openage import predict_age
         >>> result = predict_age({"glycohemoglobin_percent": 5.4, "glucose_mg_dl": 95, ...})
         >>> print(result.biological_age)
     """

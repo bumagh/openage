@@ -82,18 +82,18 @@ Survival analysis uses CDC-linked mortality data merged with the NHANES cohort (
 
 | Clock | HR | 95% CI | p | Concordance |
 |-------|-----|--------|---|-------------|
-| Healome Standard (21-feat) | 1.093 | 1.090–1.095 | < 0.005 | 0.81 |
-| **Healome Extended (35-feat)** | **1.098** | **1.095–1.100** | **< 0.005** | **0.83** |
+| OpenAge Standard (21-feat) | 1.093 | 1.090–1.095 | < 0.005 | 0.81 |
+| **OpenAge Extended (35-feat)** | **1.098** | **1.095–1.100** | **< 0.005** | **0.83** |
 | PhenoAge (Levine 2018) | 1.071 | 1.070–1.072 | < 0.005 | 0.86 |
 
-The Healome Clock achieves a higher per-year hazard ratio than PhenoAge (1.098 vs. 1.071), meaning each year of Healome biological age carries 9.8% additional mortality risk compared to 7.1% for PhenoAge. PhenoAge achieves higher concordance (0.86 vs. 0.83) because it was trained directly on a mortality phenotype, optimizing for rank-ordering individuals by death risk. For a clinically actionable clock, per-year HR is the more relevant metric: it directly quantifies how much a one-year reduction in biological age lowers mortality risk.
+OpenAge achieves a higher per-year hazard ratio than PhenoAge (1.098 vs. 1.071), meaning each year of OpenAge biological age carries 9.8% additional mortality risk compared to 7.1% for PhenoAge. PhenoAge achieves higher concordance (0.86 vs. 0.83) because it was trained directly on a mortality phenotype, optimizing for rank-ordering individuals by death risk. For a clinically actionable clock, per-year HR is the more relevant metric: it directly quantifies how much a one-year reduction in biological age lowers mortality risk.
 
 **Bivariate Cox PH** (clock + chronological age):
 
 | Clock | Clock HR | Clock 95% CI | Chrono Age HR | Concordance |
 |-------|----------|--------------|---------------|-------------|
-| Healome Standard (21-feat) | 1.020 | 1.017–1.023 | 1.080 | 0.85 |
-| Healome Extended (35-feat) | 1.022 | 1.018–1.025 | 1.077 | 0.85 |
+| OpenAge Standard (21-feat) | 1.020 | 1.017–1.023 | 1.080 | 0.85 |
+| OpenAge Extended (35-feat) | 1.022 | 1.018–1.025 | 1.077 | 0.85 |
 | PhenoAge (Levine 2018) | 1.048 | 1.046–1.051 | 1.044 | 0.87 |
 
 Both clocks contribute significant mortality prediction beyond chronological age alone (all p < 0.005).
@@ -138,11 +138,11 @@ The Kaplan-Meier curves show clear separation between these groups, with the dec
 
 | Model | Type | Features | Test MAE | Test R² | HR (univariate) | Concordance |
 |-------|------|----------|----------|---------|-----------------|-------------|
-| **Healome Standard** | GradientBoosting | 21 | **5.11** | **0.906** | 1.093 | 0.81 |
-| **Healome Extended** | GradientBoosting | 35 | 6.07 | 0.873 | **1.098** | 0.83 |
+| **OpenAge Standard** | GradientBoosting | 21 | **5.11** | **0.906** | 1.093 | 0.81 |
+| **OpenAge Extended** | GradientBoosting | 35 | 6.07 | 0.873 | **1.098** | 0.83 |
 | PhenoAge (Levine 2018) | Formula-based | 10 | — | — | 1.071 | 0.86 |
 
-PhenoAge is implemented in `healome_clock.evaluation.phenoage` for easy benchmarking. I encourage the community to add GrimAge, DunedinPACE, and other clocks. See [benchmarks/README.md](benchmarks/README.md).
+PhenoAge is implemented in `openage.evaluation.phenoage` for easy benchmarking. I encourage the community to add GrimAge, DunedinPACE, and other clocks. See [benchmarks/README.md](benchmarks/README.md).
 
 ## Training Convergence
 

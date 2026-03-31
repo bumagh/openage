@@ -1,5 +1,5 @@
 """
-Visualization utilities for the Healome Aging Clock.
+Visualization utilities for OpenAge.
 
 Generates plots for model outputs, calibration, and subgroup analysis.
 """

@@ -23,8 +23,8 @@ Contributions that improve the model's accuracy, robustness, interpretability, o
 ## Development Setup
 
 ```bash
-git clone https://github.com/nikhilYadala/healome_bio_age.git
-cd healome_bio_age
+git clone https://github.com/Healome/openage.git
+cd openage
 pip install -e ".[dev]"
 pytest
 ```
@@ -42,7 +42,7 @@ This repo maintains a dual-track leaderboard. To submit your model:
 
 1. Train on NHANES data (any cycles)
 2. Evaluate using `test_size=0.3, random_state=3454`
-3. Generate a submission JSON using `healome_clock.evaluation.leaderboard.create_submission()`
+3. Generate a submission JSON using `openage.evaluation.leaderboard.create_submission()`
 4. Open a PR adding your JSON to `benchmarks/submissions/`
 
 See [benchmarks/README.md](benchmarks/README.md) for the full specification and `notebooks/evaluation.ipynb` for a walkthrough.
@@ -52,8 +52,8 @@ See [benchmarks/README.md](benchmarks/README.md) for the full specification and 
 The data loading system is extensible. To add a new data source:
 
 1. Create a loader function that returns a pandas DataFrame with NHANES-compatible column names
-2. Register it using `healome_clock.data.registry.register_data_source()`
-3. Add documentation and a loader module to `healome_clock/data/`
+2. Register it using `openage.data.registry.register_data_source()`
+3. Add documentation and a loader module to `openage/data/`
 
 ## Questions?
 

@@ -6,8 +6,8 @@ Two tracks:
   2. Survival analysis: Kaplan-Meier curves, Cox Proportional Hazards, concordance
 """
 
-from healome_clock.evaluation.metrics import compute_age_metrics, compute_subgroup_metrics
-from healome_clock.evaluation.survival import (
+from openage.evaluation.metrics import compute_age_metrics, compute_subgroup_metrics
+from openage.evaluation.survival import (
     compute_kaplan_meier,
     compute_cox_hazard_ratios,
     classify_aging_rate,

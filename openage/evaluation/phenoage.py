@@ -5,7 +5,7 @@ Reference: Levine et al. "An epigenetic biomarker of aging for lifespan
 and healthspan." Aging (2018). DOI: 10.18632/aging.101414
 
 This is a blood-based phenotypic age formula using 9 biomarkers + chronological age.
-Implemented here for head-to-head comparison with the Healome Clock.
+Implemented here for head-to-head comparison with OpenAge.
 """
 
 import numpy as np
