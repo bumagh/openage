@@ -6,6 +6,9 @@ Developed by [Healome](https://healome.ai).
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Website](https://img.shields.io/badge/Website-openageai.com-brightgreen)](https://www.openageai.com)
+
+**Try it now** — upload a blood test report and chat with AI about your biological age at [openageai.com/chat](https://www.openageai.com/chat). No code required.
 
 ---
 
@@ -270,6 +273,11 @@ Read [LIMITATIONS.md](LIMITATIONS.md) before using. Key points:
 - Methodology paper
 
 Star this repo or follow [@Healome](https://twitter.com/nikhilyadala) for updates.
+
+## Web App
+
+- **Upload & analyze**: [openageai.com](https://www.openageai.com) — upload a blood test report, extract biomarkers via OCR, and get your biological age estimate
+- **Chat with AI**: [openageai.com/chat](https://www.openageai.com/chat) — ask questions about your results, biomarkers, and what they mean
 
 ## About
 
