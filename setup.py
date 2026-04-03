@@ -22,9 +22,9 @@ setup(
     include_package_data=True,
     python_requires=">=3.8",
     install_requires=[
-        "numpy>=1.21,<2",
+        "numpy>=1.21",
         "pandas>=1.3",
-        "scikit-learn>=1.0,<1.1",
+        "scikit-learn>=1.0",
         "joblib>=1.0",
         "matplotlib>=3.4",
         "huggingface_hub>=0.20",

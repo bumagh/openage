@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生物年龄预测 · 长寿奇妙日</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f0f4f8;color:#333;min-height:100vh}
+header{background:linear-gradient(135deg,#1a6b3c,#2d9e5f);color:#fff;padding:18px 24px;text-align:center}
+header h1{font-size:1.5rem;font-weight:700;letter-spacing:2px}
+header p{font-size:.85rem;opacity:.85;margin-top:4px}
+.tabs{display:flex;background:#fff;border-bottom:2px solid #e0e0e0;overflow-x:auto}
+.tab-btn{flex:1;min-width:120px;padding:12px 8px;border:none;background:none;cursor:pointer;font-size:.9rem;color:#666;border-bottom:3px solid transparent;transition:.2s}
+.tab-btn.active{color:#1a6b3c;border-bottom-color:#1a6b3c;font-weight:600}
+.tab-content{display:none;padding:20px;max-width:900px;margin:0 auto}
+.tab-content.active{display:block}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.card h2{font-size:1.1rem;color:#1a6b3c;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #e8f5ee}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:.8rem;color:#555;font-weight:500}
+.form-group input,select{padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:.9rem;transition:.2s}
+.form-group input:focus,select:focus{outline:none;border-color:#2d9e5f;box-shadow:0 0 0 2px rgba(45,158,95,.15)}
+.btn{padding:10px 24px;border:none;border-radius:8px;cursor:pointer;font-size:.95rem;font-weight:600;transition:.2s}
+.btn-primary{background:#1a6b3c;color:#fff}
+.btn-primary:hover{background:#155c33}
+.btn-secondary{background:#e8f5ee;color:#1a6b3c}
+.btn-secondary:hover{background:#d0eddc}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.result-box{background:#f0faf4;border:1px solid #b8e0c8;border-radius:10px;padding:16px;margin-top:16px}
+.result-box h3{color:#1a6b3c;margin-bottom:12px}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.result-item{text-align:center;background:#fff;border-radius:8px;padding:10px}
+.result-item .val{font-size:1.6rem;font-weight:700;color:#1a6b3c}
+.result-item .lbl{font-size:.75rem;color:#888;margin-top:2px}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600}
+.badge-good{background:#d4edda;color:#155724}
+.badge-warn{background:#fff3cd;color:#856404}
+.badge-bad{background:#f8d7da;color:#721c24}
+.upload-area{border:2px dashed #b8e0c8;border-radius:10px;padding:30px;text-align:center;cursor:pointer;transition:.2s;background:#fafffe}
+.upload-area:hover{border-color:#2d9e5f;background:#f0faf4}
+.upload-area input{display:none}
+.upload-area p{color:#888;font-size:.9rem;margin-top:8px}
+.chat-box{height:360px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:10px;padding:12px;background:#fafafa;margin-bottom:10px}
+.msg{margin-bottom:10px;display:flex;gap:8px}
+.msg.user{flex-direction:row-reverse}
+.msg .bubble{max-width:75%;padding:8px 12px;border-radius:10px;font-size:.9rem;line-height:1.5}
+.msg.user .bubble{background:#1a6b3c;color:#fff;border-radius:10px 2px 10px 10px}
+.msg.ai .bubble{background:#fff;border:1px solid #e0e0e0;border-radius:2px 10px 10px 10px}
+.chat-input-row{display:flex;gap:8px}
+.chat-input-row input{flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:.9rem}
+.hint{font-size:.78rem;color:#999;margin-top:4px}
+.section-title{font-size:.85rem;font-weight:600;color:#555;margin:12px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+#preview-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;display:none}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag-longevity{background:#1a6b3c;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:28px 24px;max-width:340px;width:92%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal h3{color:#c0392b;font-size:1.05rem;margin-bottom:6px}
+.modal .sub{font-size:.82rem;color:#888;margin-bottom:14px}
+.modal .divider{border:none;border-top:1px solid #eee;margin:14px 0}
+.modal .section-label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:8px;text-align:left}
+.modal .code-row{display:flex;gap:8px;margin-bottom:8px}
+.modal .code-row input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:.9rem}
+.modal .code-row button{padding:8px 14px;background:#1a6b3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;white-space:nowrap}
+.modal .code-hint{font-size:.75rem;color:#999;text-align:left;margin-bottom:4px}
+.modal img{width:150px;height:150px;border:1px solid #e0e0e0;border-radius:8px;margin:8px auto 4px;display:block}
+.modal .qr-label{font-size:.75rem;color:#aaa;margin-bottom:10px}
+.modal .close-btn{background:#f0f0f0;color:#333;padding:7px 20px;border:none;border-radius:8px;cursor:pointer;font-size:.88rem}
+.remain-badge{font-size:.75rem;color:#888;margin-top:6px}
+.remain-badge span{font-weight:600;color:#1a6b3c}
+.share-btn{background:#f0faf4;color:#1a6b3c;border:1px solid #b8e0c8;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:600}
+.share-btn:hover{background:#d0eddc}
+</style>
+</head>
+<body>
+<header>
+  <h1>生物年龄预测 <span class="tag-longevity">长寿奇妙日</span></h1>
+  <p>基于血液检测数据，科学评估您的生物年龄 · 由长寿奇妙日提供服务</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('longevity')">长寿奇妙日版预测</button>
+  <button class="tab-btn" onclick="switchTab('standard')">标准版预测</button>
+  <button class="tab-btn" onclick="switchTab('chat')">AI 健康顾问</button>
+</div>
+
+<!-- 长寿奇妙日版 (extended model) -->
+<div id="tab-longevity" class="tab-content active">
+  <div class="card">
+    <h2>长寿奇妙日 · 生物年龄评估</h2>
+    <p style="font-size:.85rem;color:#666;margin-bottom:16px">上传血检报告图片自动识别，或手动填写以下指标（19项血检 + 身高体重）</p>
+
+    <div class="upload-area" onclick="document.getElementById('ocr-file-ext').click()">
+      <input type="file" id="ocr-file-ext" accept="image/*" onchange="handleOCR(this,'ext')">
+      <svg width="40" height="40" fill="none" stroke="#2d9e5f" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p>点击上传血检报告图片（支持 JPG/PNG）</p>
+      <img id="preview-img-ext" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:10px;display:none">
+    </div>
+    <div id="ocr-status-ext" style="font-size:.85rem;color:#888;margin-top:8px"></div>
+    <div class="remain-badge">今日剩余识别次数：<span id="remain-ocr">--</span> 次</div>
+  </div>
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>实际年龄 *</label>
+        <input type="number" id="ext-age" placeholder="岁" min="18" max="100">
+      </div>
+      <div class="form-group">
+        <label>身高 (cm)</label>
+        <input type="number" id="ext-height" placeholder="cm" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>体重 (kg)</label>
+        <input type="number" id="ext-weight" placeholder="kg" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:16px">血糖</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>空腹血糖 Glucose (mg/dL)</label>
+        <input type="number" id="ext-glucose" placeholder="mg/dL" step="0.1">
+        <span class="hint">若单位mmol/L，乘以18</span>
+      </div>
+      <div class="form-group">
+        <label>糖化血红蛋白 HbA1c (%)</label>
+        <input type="number" id="ext-hba1c" placeholder="%" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">血常规</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>红细胞压积 Hematocrit (%)</label>
+        <input type="number" id="ext-hematocrit" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>平均红细胞体积 MCV (fL)</label>
+        <input type="number" id="ext-mcv" placeholder="fL" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>血小板 Platelets (10³/μL)</label>
+        <input type="number" id="ext-plt" placeholder="10³/μL" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>红细胞计数 RBC (10⁶/μL)</label>
+        <input type="number" id="ext-rbc" placeholder="10⁶/μL" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>血红蛋白 Hemoglobin (g/dL)</label>
+        <input type="number" id="ext-hgb" placeholder="g/dL" step="0.1">
+        <span class="hint">若单位g/L，除以10</span>
+      </div>
+      <div class="form-group">
+        <label>白细胞计数 WBC (10³/μL)</label>
+        <input type="number" id="ext-wbc" placeholder="10³/μL" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>淋巴细胞% Lymphocyte (%)</label>
+        <input type="number" id="ext-lymph-pct" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>单核细胞% Monocyte (%)</label>
+        <input type="number" id="ext-mono-pct" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>红细胞分布宽度 RDW (%)</label>
+        <input type="number" id="ext-rdw" placeholder="%" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">肝功能</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>总蛋白 Total Protein (g/dL)</label>
+        <input type="number" id="ext-tp" placeholder="g/dL" step="0.1">
+        <span class="hint">若单位g/L，除以10</span>
+      </div>
+      <div class="form-group">
+        <label>总胆红素 Bilirubin (mg/dL)</label>
+        <input type="number" id="ext-tbil" placeholder="mg/dL" step="0.01">
+        <span class="hint">若单位μmol/L，除以17.1</span>
+      </div>
+      <div class="form-group">
+        <label>谷丙转氨酶 ALT (IU/L)</label>
+        <input type="number" id="ext-alt" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>谷草转氨酶 AST (IU/L)</label>
+        <input type="number" id="ext-ast" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>碱性磷酸酶 ALP (IU/L)</label>
+        <input type="number" id="ext-alp" placeholder="IU/L" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">肾功能</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>肌酐 Creatinine (mg/dL)</label>
+        <input type="number" id="ext-creat" placeholder="mg/dL" step="0.01">
+        <span class="hint">若单位μmol/L，除以88.4</span>
+      </div>
+      <div class="form-group">
+        <label>尿素氮 BUN (mg/dL)</label>
+        <input type="number" id="ext-bun" placeholder="mg/dL" step="0.1">
+        <span class="hint">若单位mmol/L，乘以2.8</span>
+      </div>
+    </div>
+
+    <div class="section-title">血脂</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>甘油三酯 TG (mg/dL)</label>
+        <input type="number" id="ext-tg" placeholder="mg/dL" step="0.1">
+        <span class="hint">若单位mmol/L，乘以88.6</span>
+      </div>
+      <div class="form-group">
+        <label>HDL胆固醇 (mg/dL)</label>
+        <input type="number" id="ext-hdl" placeholder="mg/dL" step="0.1">
+        <span class="hint">若单位mmol/L，乘以38.67</span>
+      </div>
+      <div class="form-group">
+        <label>LDL胆固醇 (mg/dL)</label>
+        <input type="number" id="ext-ldl" placeholder="mg/dL" step="0.1">
+        <span class="hint">若单位mmol/L，乘以38.67</span>
+      </div>
+    </div>
+
+    <div class="section-title">电解质</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>血钠 Sodium (mmol/L)</label>
+        <input type="number" id="ext-na" placeholder="mmol/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>血钙 Calcium (mg/dL)</label>
+        <input type="number" id="ext-ca" placeholder="mg/dL" step="0.01">
+        <span class="hint">若单位mmol/L，乘以4.0</span>
+      </div>
+      <div class="form-group">
+        <label>血钾 Potassium (mmol/L)</label>
+        <input type="number" id="ext-k" placeholder="mmol/L" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>血氯 Chloride (mmol/L)</label>
+        <input type="number" id="ext-cl" placeholder="mmol/L" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">病史</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>曾患癌症/恶性肿瘤</label>
+        <select id="ext-cancer"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患心绞痛</label>
+        <select id="ext-angina"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患关节炎</label>
+        <select id="ext-arthritis"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患肝脏疾病</label>
+        <select id="ext-liver"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患胆结石</label>
+        <select id="ext-gall"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="predictExt()"><span id="ext-spinner" style="display:none" class="spinner"></span>开始预测</button>
+      <button class="btn btn-secondary" onclick="clearForm('ext')">清空</button>
+    </div>
+  </div>
+
+  <div id="ext-result" style="display:none" class="card">
+    <h2>预测结果</h2>
+    <div class="result-box">
+      <div class="result-grid">
+        <div class="result-item"><div class="val" id="ext-bio-age">--</div><div class="lbl">生物年龄</div></div>
+        <div class="result-item"><div class="val" id="ext-chron-age">--</div><div class="lbl">实际年龄</div></div>
+        <div class="result-item"><div class="val" id="ext-delta">--</div><div class="lbl">差值（年）</div></div>
+      </div>
+      <div style="margin-top:12px">状态：<span id="ext-badge" class="badge"></span></div>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="goChat('ext')">与AI顾问讨论此报告</button>
+      <button class="share-btn" onclick="shareResult('ext')">分享结果</button>
+    </div>
+  </div>
+</div>
+
+<!-- 标准版 -->
+<div id="tab-standard" class="tab-content">
+  <div class="card">
+    <h2>标准版预测</h2>
+    <p style="font-size:.85rem;color:#666;margin-bottom:16px">上传血检报告图片自动识别，或手动填写</p>
+
+    <div class="upload-area" onclick="document.getElementById('ocr-file-std').click()">
+      <input type="file" id="ocr-file-std" accept="image/*" onchange="handleOCR(this,'std')">
+      <svg width="40" height="40" fill="none" stroke="#2d9e5f" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      <p>点击上传血检报告图片</p>
+      <img id="preview-img-std" style="max-width:100%;max-height:180px;border-radius:8px;margin-top:10px;display:none">
+    </div>
+    <div id="ocr-status-std" style="font-size:.85rem;color:#888;margin-top:8px"></div>
+    <div class="remain-badge">今日剩余识别次数：<span id="remain-ocr-std">--</span> 次（与长寿奇妙日版共享）</div>
+  </div>
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>实际年龄 *</label>
+        <input type="number" id="std-age" placeholder="岁" min="18" max="100">
+      </div>
+      <div class="form-group">
+        <label>平均红细胞体积 MCV (fL)</label>
+        <input type="number" id="std-mcv" placeholder="fL" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>糖化血红蛋白 HbA1c (%)</label>
+        <input type="number" id="std-hba1c" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>谷丙转氨酶 ALT (IU/L)</label>
+        <input type="number" id="std-alt" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>红细胞计数 RBC (10⁶/μL)</label>
+        <input type="number" id="std-rbc" placeholder="10⁶/μL" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>血小板 Platelets (10³/μL)</label>
+        <input type="number" id="std-plt" placeholder="10³/μL" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>乳酸脱氢酶 LDH (IU/L)</label>
+        <input type="number" id="std-ldh" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>淋巴细胞% (%)</label>
+        <input type="number" id="std-lymph-pct" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>淋巴细胞绝对值 (10³/μL)</label>
+        <input type="number" id="std-lymph-abs" placeholder="10³/μL" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>肌酸激酶 CPK (IU/L)</label>
+        <input type="number" id="std-cpk" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>肌酐 Creatinine (mg/dL)</label>
+        <input type="number" id="std-creat" placeholder="mg/dL" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>碱性磷酸酶 ALP (IU/L)</label>
+        <input type="number" id="std-alp" placeholder="IU/L" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>血钾 Potassium (mmol/L)</label>
+        <input type="number" id="std-k" placeholder="mmol/L" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>红细胞分布宽度 RDW (%)</label>
+        <input type="number" id="std-rdw" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>单核细胞% (%)</label>
+        <input type="number" id="std-mono-pct" placeholder="%" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>尿素氮 BUN (mg/dL)</label>
+        <input type="number" id="std-bun" placeholder="mg/dL" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>空腹血糖 Glucose (mg/dL)</label>
+        <input type="number" id="std-glucose" placeholder="mg/dL" step="0.1">
+      </div>
+    </div>
+
+    <div class="section-title">病史</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>曾患癌症/恶性肿瘤</label>
+        <select id="std-cancer"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患心绞痛</label>
+        <select id="std-angina"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患关节炎</label>
+        <select id="std-arthritis"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患肝脏疾病</label>
+        <select id="std-liver"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+      <div class="form-group">
+        <label>曾患胆结石</label>
+        <select id="std-gall"><option value="2">否</option><option value="1">是</option></select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="predictStd()"><span id="std-spinner" style="display:none" class="spinner"></span>开始预测</button>
+      <button class="btn btn-secondary" onclick="clearForm('std')">清空</button>
+    </div>
+  </div>
+
+  <div id="std-result" style="display:none" class="card">
+    <h2>预测结果</h2>
+    <div class="result-box">
+      <div class="result-grid">
+        <div class="result-item"><div class="val" id="std-bio-age">--</div><div class="lbl">生物年龄</div></div>
+        <div class="result-item"><div class="val" id="std-chron-age">--</div><div class="lbl">实际年龄</div></div>
+        <div class="result-item"><div class="val" id="std-delta">--</div><div class="lbl">差值（年）</div></div>
+      </div>
+      <div style="margin-top:12px">状态：<span id="std-badge" class="badge"></span></div>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-secondary" onclick="goChat('std')">与AI顾问讨论此报告</button>
+      <button class="share-btn" onclick="shareResult('std')">分享结果</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI 对话 -->
+<div id="tab-chat" class="tab-content">
+  <div class="card">
+    <h2>AI 健康顾问</h2>
+    <p style="font-size:.85rem;color:#666;margin-bottom:12px">基于您的报告，与AI顾问深入交流健康建议</p>
+    <div class="chat-box" id="chat-box"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="输入您的问题..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-primary" onclick="sendChat()">发送</button>
+    </div>
+    <div class="remain-badge" style="margin-top:6px">今日剩余对话次数：<span id="remain-chat">--</span> 次</div>
+  </div>
+</div>
+
+<script>
+let reportContext = null;
+let chatHistory = [];
+let _limitFeature = 'chat'; // which feature triggered the modal
+
+// ── localStorage usage tracking ──────────────────────────────
+function _today() { return new Date().toISOString().slice(0,10); }
+function getUsed(f) { return parseInt(localStorage.getItem(`u_${f}_${_today()}`)||'0'); }
+function incUsed(f) { localStorage.setItem(`u_${f}_${_today()}`, getUsed(f)+1); updateCounts(); }
+function getBonus(f) { return parseInt(localStorage.getItem(`b_${f}_${_today()}`)||'0'); }
+function addBonus(f,n) { localStorage.setItem(`b_${f}_${_today()}`, getBonus(f)+n); updateCounts(); }
+function getRemaining(f) { const base=f==='ocr'?3:10; return Math.max(0, base+getBonus(f)-getUsed(f)); }
+
+function updateCounts() {
+  const ro = getRemaining('ocr'), rc = getRemaining('chat');
+  ['remain-ocr','remain-ocr-std'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=ro;
+  });
+  const rc_el=document.getElementById('remain-chat'); if(rc_el) rc_el.textContent=rc;
+}
+
+// ── tabs ──────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active', ['longevity','standard','chat'][i]===name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── OCR ───────────────────────────────────────────────────────
+async function handleOCR(input, prefix) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('preview-img-'+prefix);
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = 'block';
+  const status = document.getElementById('ocr-status-'+prefix);
+  status.textContent = '正在识别图片...';
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const res = await fetch('api/ocr', {method:'POST', body:fd});
+    if (res.status===429) { showLimitModal('ocr'); status.textContent=''; return; }
+    if (!res.ok) { const e=await res.json(); throw new Error(e.detail||'识别失败'); }
+    incUsed('ocr');
+    const data = await res.json();
+    fillForm(prefix, data);
+    status.textContent = '识别完成，请核对数据';
+  } catch(e) {
+    status.textContent = '识别失败：'+e.message;
+  }
+}
+
+// ── form helpers ──────────────────────────────────────────────
+function fillForm(prefix, data) {
+  const map = {
+    'ext': {
+      'mean_cell_volume_fl':'ext-mcv','glycohemoglobin_percent':'ext-hba1c',
+      'alt_iu_l':'ext-alt','ast_iu_l':'ext-ast','alp_iu_l':'ext-alp',
+      'rbc_count_million_per_ul':'ext-rbc','platelet_count_thousand_per_ul':'ext-plt',
+      'hemoglobin_g_dl':'ext-hgb','hematocrit_percent':'ext-hematocrit',
+      'wbc_count_thousand_per_ul':'ext-wbc','lymphocyte_percent':'ext-lymph-pct',
+      'monocyte_percent':'ext-mono-pct','rdw_percent':'ext-rdw',
+      'creatinine_mg_dl':'ext-creat','bun_mg_dl':'ext-bun',
+      'glucose_mg_dl':'ext-glucose','total_protein_g_dl':'ext-tp',
+      'total_bilirubin_mg_dl':'ext-tbil','triglycerides_mg_dl':'ext-tg',
+      'hdl_cholesterol_mg_dl':'ext-hdl','ldl_cholesterol_mg_dl':'ext-ldl',
+      'sodium_mmol_l':'ext-na','calcium_mg_dl':'ext-ca','potassium_mmol_l':'ext-k',
+      'chloride_mmol_l':'ext-cl'
+    },
+    'std': {
+      'mean_cell_volume_fl':'std-mcv','glycohemoglobin_percent':'std-hba1c',
+      'alt_iu_l':'std-alt','rbc_count_million_per_ul':'std-rbc',
+      'platelet_count_thousand_per_ul':'std-plt','ldh_iu_l':'std-ldh',
+      'lymphocyte_percent':'std-lymph-pct','lymphocyte_count_thousand_per_ul':'std-lymph-abs',
+      'cpk_iu_l':'std-cpk','creatinine_mg_dl':'std-creat','alp_iu_l':'std-alp',
+      'potassium_mmol_l':'std-k','rdw_percent':'std-rdw','monocyte_percent':'std-mono-pct',
+      'bun_mg_dl':'std-bun','glucose_mg_dl':'std-glucose'
+    }
+  };
+  const m = map[prefix];
+  for (const [key, id] of Object.entries(m)) {
+    if (data[key] !== undefined) { const el=document.getElementById(id); if(el) el.value=data[key]; }
+  }
+}
+
+function getVal(id) { const el=document.getElementById(id); if(!el) return null; const v=parseFloat(el.value); return isNaN(v)?null:v; }
+function getInt(id) { const el=document.getElementById(id); return el?parseInt(el.value):2; }
+
+// ── predict ───────────────────────────────────────────────────
+async function predictExt() {
+  const age = getVal('ext-age');
+  if (!age) { alert('请填写实际年龄'); return; }
+  const spinner = document.getElementById('ext-spinner');
+  spinner.style.display = 'inline-block';
+  const payload = {
+    chronological_age: age, variant: 'extended',
+    mean_cell_volume_fl: getVal('ext-mcv'), glycohemoglobin_percent: getVal('ext-hba1c'),
+    alt_iu_l: getVal('ext-alt'), ast_iu_l: getVal('ext-ast'), alp_iu_l: getVal('ext-alp'),
+    rbc_count_million_per_ul: getVal('ext-rbc'), platelet_count_thousand_per_ul: getVal('ext-plt'),
+    hemoglobin_g_dl: getVal('ext-hgb'), hematocrit_percent: getVal('ext-hematocrit'),
+    wbc_count_thousand_per_ul: getVal('ext-wbc'),
+    lymphocyte_percent: getVal('ext-lymph-pct'), monocyte_percent: getVal('ext-mono-pct'),
+    rdw_percent: getVal('ext-rdw'), creatinine_mg_dl: getVal('ext-creat'),
+    bun_mg_dl: getVal('ext-bun'), glucose_mg_dl: getVal('ext-glucose'),
+    total_protein_g_dl: getVal('ext-tp'), total_bilirubin_mg_dl: getVal('ext-tbil'),
+    triglycerides_mg_dl: getVal('ext-tg'), hdl_cholesterol_mg_dl: getVal('ext-hdl'),
+    ldl_cholesterol_mg_dl: getVal('ext-ldl'), sodium_mmol_l: getVal('ext-na'),
+    calcium_mg_dl: getVal('ext-ca'), potassium_mmol_l: getVal('ext-k'),
+    chloride_mmol_l: getVal('ext-cl'),
+    ever_cancer_or_malignancy: getInt('ext-cancer'), ever_angina: getInt('ext-angina'),
+    ever_arthritis: getInt('ext-arthritis'), ever_liver_condition: getInt('ext-liver'),
+    ever_gallstones: getInt('ext-gall')
+  };
+  try {
+    const res = await fetch('api/predict', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if (!res.ok) { const e=await res.json(); throw new Error(e.detail||'预测失败'); }
+    showResult('ext', await res.json(), payload);
+  } catch(e) { alert('预测失败：'+e.message); }
+  finally { spinner.style.display='none'; }
+}
+
+async function predictStd() {
+  const age = getVal('std-age');
+  if (!age) { alert('请填写实际年龄'); return; }
+  const spinner = document.getElementById('std-spinner');
+  spinner.style.display = 'inline-block';
+  const payload = {
+    chronological_age: age, variant: 'standard',
+    mean_cell_volume_fl: getVal('std-mcv'), glycohemoglobin_percent: getVal('std-hba1c'),
+    alt_iu_l: getVal('std-alt'), rbc_count_million_per_ul: getVal('std-rbc'),
+    platelet_count_thousand_per_ul: getVal('std-plt'), ldh_iu_l: getVal('std-ldh'),
+    lymphocyte_percent: getVal('std-lymph-pct'), lymphocyte_count_thousand_per_ul: getVal('std-lymph-abs'),
+    cpk_iu_l: getVal('std-cpk'), creatinine_mg_dl: getVal('std-creat'),
+    alp_iu_l: getVal('std-alp'), potassium_mmol_l: getVal('std-k'),
+    rdw_percent: getVal('std-rdw'), monocyte_percent: getVal('std-mono-pct'),
+    bun_mg_dl: getVal('std-bun'), glucose_mg_dl: getVal('std-glucose'),
+    ever_cancer_or_malignancy: getInt('std-cancer'), ever_angina: getInt('std-angina'),
+    ever_arthritis: getInt('std-arthritis'), ever_liver_condition: getInt('std-liver'),
+    ever_gallstones: getInt('std-gall')
+  };
+  try {
+    const res = await fetch('api/predict', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if (!res.ok) { const e=await res.json(); throw new Error(e.detail||'预测失败'); }
+    showResult('std', await res.json(), payload);
+  } catch(e) { alert('预测失败：'+e.message); }
+  finally { spinner.style.display='none'; }
+}
+
+function showResult(prefix, data, panel) {
+  document.getElementById(prefix+'-bio-age').textContent = data.biological_age;
+  document.getElementById(prefix+'-chron-age').textContent = data.chronological_age;
+  const delta = data.delta;
+  document.getElementById(prefix+'-delta').textContent = delta!==null?(delta>0?'+':'')+delta:'--';
+  const badge = document.getElementById(prefix+'-badge');
+  badge.textContent = data.classification||'--';
+  badge.className = 'badge';
+  if (data.classification) {
+    const c = data.classification.toLowerCase();
+    if (c.includes('accelerat')||c.includes('older')) badge.classList.add('badge-bad');
+    else if (c.includes('decelerat')||c.includes('younger')) badge.classList.add('badge-good');
+    else badge.classList.add('badge-warn');
+  }
+  document.getElementById(prefix+'-result').style.display = 'block';
+  reportContext = {...data, blood_panel: panel};
+}
+
+// ── share ─────────────────────────────────────────────────────
+function shareResult(prefix) {
+  const bio = document.getElementById(prefix+'-bio-age').textContent;
+  const chron = document.getElementById(prefix+'-chron-age').textContent;
+  const delta = document.getElementById(prefix+'-delta').textContent;
+  const cls = document.getElementById(prefix+'-badge').textContent;
+  const text = `我的生物年龄测试结果\n实际年龄：${chron}岁\n生物年龄：${bio}岁\n差值：${delta}年（${cls}）\n\n来自长寿奇妙日生物年龄预测\nhttps://app.tutlab.tech/age/`;
+  if (navigator.share) {
+    navigator.share({title:'我的生物年龄', text}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text).then(()=>alert('结果已复制到剪贴板')).catch(()=>alert(text));
+  }
+}
+
+// ── chat ──────────────────────────────────────────────────────
+function goChat(prefix) {
+  switchTab('chat');
+  chatHistory = [];
+  document.getElementById('chat-box').innerHTML = '';
+  appendMsg('ai', '您好！我已收到您的生物年龄报告，请问有什么想了解的？');
+}
+
+function clearForm(prefix) {
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(el=>{
+    if (el.tagName==='INPUT') el.value='';
+    else if (el.tagName==='SELECT') el.value='2';
+  });
+  document.getElementById(prefix+'-result').style.display='none';
+}
+
+function appendMsg(role, text) {
+  const box = document.getElementById('chat-box');
+  const div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = '<div class="bubble">'+text.replace(/\n/g,'<br>')+'</div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div.querySelector('.bubble');
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  if (!reportContext) {
+    appendMsg('ai', '⚠️ 请先在「长寿奇妙日版预测」或「标准版预测」中完成生物年龄预测，再来与我交流。');
+    return;
+  }
+  input.value = '';
+  appendMsg('user', msg);
+  const bubble = appendMsg('ai', '');
+  let full = '';
+  try {
+    const res = await fetch('api/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message:msg, history:chatHistory, report_context:reportContext})
+    });
+    if (res.status===429) {
+      bubble.textContent = '今日对话次数已达上限，请联系客服充值。';
+      showLimitModal('chat');
+      return;
+    }
+    if (!res.ok) { const e=await res.json(); throw new Error(e.detail||'请求失败'); }
+    incUsed('chat');
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      for (const line of dec.decode(value).split('\n')) {
+        if (!line.startsWith('data:')) continue;
+        const d = line.slice(5).trim();
+        if (d==='[DONE]') break;
+        try { full += JSON.parse(d).text; bubble.innerHTML = full.replace(/\n/g,'<br>'); } catch{}
+      }
+    }
+    chatHistory.push({role:'user',content:msg},{role:'assistant',content:full});
+    document.getElementById('chat-box').scrollTop = 9999;
+  } catch(e) {
+    bubble.textContent = '请求失败：'+e.message;
+  }
+}
+
+// ── limit modal ───────────────────────────────────────────────
+function showLimitModal(feature) {
+  _limitFeature = feature;
+  const label = feature==='ocr'?'识别':'对话';
+  const base = feature==='ocr'?3:10;
+  document.getElementById('modal-title').textContent = `今日${label}次数已用完`;
+  document.getElementById('modal-sub').textContent = `每日免费${label} ${base} 次，已全部使用。输入授权码可增加 3 次。`;
+  document.getElementById('redeem-input').value = '';
+  document.getElementById('redeem-msg').textContent = '';
+  document.getElementById('limit-modal').classList.add('show');
+}
+
+async function submitRedeem() {
+  const code = document.getElementById('redeem-input').value.trim();
+  const msg = document.getElementById('redeem-msg');
+  if (!code) { msg.textContent = '请输入授权码'; return; }
+  try {
+    const res = await fetch('api/redeem', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({code, feature: _limitFeature})
+    });
+    if (res.status===400) { msg.style.color='#c0392b'; msg.textContent='授权码无效，请重试'; return; }
+    const data = await res.json();
+    addBonus(_limitFeature, data.added);
+    msg.style.color='#1a6b3c';
+    msg.textContent = `成功！已增加 ${data.added} 次`;
+    setTimeout(()=>document.getElementById('limit-modal').classList.remove('show'), 1200);
+  } catch(e) {
+    msg.style.color='#c0392b'; msg.textContent='网络错误，请重试';
+  }
+}
+
+// init
+updateCounts();
+</script>
+
+<!-- 次数限制弹窗 -->
+<div class="modal-overlay" id="limit-modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <h3 id="modal-title">今日次数已用完</h3>
+    <p class="sub" id="modal-sub"></p>
+    <hr class="divider">
+    <div class="section-label">输入授权码增加 3 次</div>
+    <div class="code-row">
+      <input type="text" id="redeem-input" placeholder="请输入授权码">
+      <button onclick="submitRedeem()">确认</button>
+    </div>
+    <div id="redeem-msg" class="code-hint"></div>
+    <hr class="divider">
+    <div class="section-label">或扫码联系客服充值</div>
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTZiM2MiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjI1IiB5PSIyNSIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iMTEwIiB5PSIxMCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTZiM2MiIHN0cm9rZS13aWR0aD0iNiIvPjxyZWN0IHg9IjEyNSIgeT0iMjUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjEwIiB5PSIxMTAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWE2YjNjIiBzdHJva2Utd2lkdGg9IjYiLz48cmVjdCB4PSIyNSIgeT0iMTI1IiB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSI4MCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjgwIiB5PSIzMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iODAiIHk9IjUwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSI4MCIgeT0iODAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjEwIiB5PSI4MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iMzAiIHk9IjgwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSI1MCIgeT0iODAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjExMCIgeT0iODAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjEzMCIgeT0iODAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjE1MCIgeT0iODAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjExMCIgeT0iMTEwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSIxMzAiIHk9IjExMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iMTUwIiB5PSIxMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjExMCIgeT0iMTMwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSIxMzAiIHk9IjEzMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iMTUwIiB5PSIxMzAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjxyZWN0IHg9IjExMCIgeT0iMTUwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMxYTZiM2MiLz48cmVjdCB4PSIxMzAiIHk9IjE1MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjMWE2YjNjIi8+PHJlY3QgeD0iMTUwIiB5PSIxNTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzFhNmIzYyIvPjx0ZXh0IHg9IjkwIiB5PSIxNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2NjYiPuaZqumAmuWHuuWIsOWbvuagh+aXpTwvdGV4dD48L3N2Zz4=" alt="客服二维码">
+    <div class="qr-label">示例二维码 · 请替换为实际客服二维码</div>
+    <button class="close-btn" onclick="document.getElementById('limit-modal').classList.remove('show')">关闭</button>
+  </div>
+</div>
+</body>
+</html>

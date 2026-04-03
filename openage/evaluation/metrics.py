@@ -110,7 +110,7 @@ def print_metrics(metrics: Dict[str, float], title: str = "Model Performance"):
     print(f"{'=' * 50}")
     print(f"  MAE:       {metrics['mae']:.2f} years")
     print(f"  RMSE:      {metrics['rmse']:.2f} years")
-    print(f"  R²:        {metrics['r2']:.4f}")
+    print(f"  R2:        {metrics['r2']:.4f}")
     print(f"  Pearson r: {metrics['pearson_r']:.4f}")
     print(f"  N:         {metrics['n_samples']:,}")
     print(f"{'=' * 50}\n")
